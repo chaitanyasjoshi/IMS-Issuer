@@ -206,7 +206,7 @@ export default function Navbar(props) {
         <Route path='/projects'></Route>
         <Route path='/requests'></Route>
         <Route path='/'>
-          <Dashboard user={props.user} />
+          <Dashboard user={props.user} contract={props.contract} />
         </Route>
       </Switch>
     </Router>

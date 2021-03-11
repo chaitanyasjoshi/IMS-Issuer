@@ -8,6 +8,7 @@ export default class Dashboard extends Component {
     this.handleDocNameChange = this.handleDocNameChange.bind(this);
     this.addField = this.addField.bind(this);
     this.removeField = this.removeField.bind(this);
+    this.issueDocument = this.issueDocument.bind(this);
     this.state = {
       formData: [],
       templateData: [],
@@ -37,14 +38,16 @@ export default class Dashboard extends Component {
     const templateData = [...this.state.templateData];
 
     const label = prompt('Enter field name');
-    const field = {
-      fieldLabel: label,
-      fieldValue: '',
-    };
+    if (label) {
+      const field = {
+        fieldLabel: label,
+        fieldValue: '',
+      };
 
-    formData.push(field);
-    templateData.push(label);
-    this.setState({ formData, templateData });
+      formData.push(field);
+      templateData.push(label);
+      this.setState({ formData, templateData });
+    }
   }
 
   removeField(index) {
@@ -53,6 +56,29 @@ export default class Dashboard extends Component {
     formData.splice(index, 1);
     templateData.splice(index, 1);
     this.setState({ formData, templateData });
+  }
+
+  issueDocument() {
+    this.props.contract.methods
+      .issueDocument(
+        this.state.documentName,
+        JSON.stringify(this.state.formData),
+        this.state.ownerAddress
+      )
+      .send({ from: this.props.user });
+
+    this.props.contract.methods
+      .createTemplate(
+        this.state.documentName,
+        JSON.stringify(this.state.templateData)
+      )
+      .send({ from: this.props.user });
+
+    const formdata = [];
+    const templateData = [];
+    const ownerAddress = '';
+    const documentName = '';
+    this.setState({ formdata, templateData, ownerAddress, documentName });
   }
 
   render() {
@@ -92,7 +118,9 @@ export default class Dashboard extends Component {
                       name='ownerAddress'
                       id='ownerAddress'
                       autoComplete='off'
+                      required
                       onChange={this.handleOwnerChange}
+                      value={this.state.ownerAddress}
                       className='mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md'
                     />
                   </div>
@@ -109,7 +137,9 @@ export default class Dashboard extends Component {
                       name='documentName'
                       id='documentName'
                       autoComplete='off'
+                      required
                       onChange={this.handleDocNameChange}
+                      value={this.state.documentName}
                       className='mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md'
                     />
                   </div>
@@ -125,14 +155,18 @@ export default class Dashboard extends Component {
                       <div className='flex'>
                         <input
                           type={`${
-                            field.fieldLabel.includes('Date') ? 'date' : 'text'
+                            field.fieldLabel.toLowerCase().includes('date')
+                              ? 'date'
+                              : 'text'
                           }`}
                           name={`${field.fieldLabel.replace(/\s/g, '')}`}
                           id={`${field.fieldLabel.replace(/\s/g, '')}`}
                           autoComplete='off'
+                          required
                           onChange={(event) => {
                             this.handleInputChange(event, i);
                           }}
+                          value={this.state.formData[i].fieldValue}
                           className='mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md'
                         />
                         <button
@@ -189,7 +223,10 @@ export default class Dashboard extends Component {
                 </div>
               </div>
               <div className='px-4 py-3 bg-gray-100 text-right sm:px-6'>
-                <button className='inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'>
+                <button
+                  onClick={this.issueDocument}
+                  className='inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+                >
                   Issue document
                 </button>
               </div>
