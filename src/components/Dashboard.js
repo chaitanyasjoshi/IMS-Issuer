@@ -45,7 +45,7 @@ export default class Dashboard extends Component {
       };
 
       formData.push(field);
-      templateData.push(label);
+      templateData.push({ label });
       this.setState({ formData, templateData });
     }
   }
@@ -74,11 +74,11 @@ export default class Dashboard extends Component {
       )
       .send({ from: this.props.user });
 
-    const formdata = [];
+    const formData = [];
     const templateData = [];
     const ownerAddress = '';
     const documentName = '';
-    this.setState({ formdata, templateData, ownerAddress, documentName });
+    this.setState({ formData, templateData, ownerAddress, documentName });
   }
 
   render() {
