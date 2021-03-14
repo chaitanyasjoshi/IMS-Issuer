@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-
 export default class Dashboard extends Component {
   constructor(props) {
     super(props);
@@ -59,26 +58,38 @@ export default class Dashboard extends Component {
   }
 
   issueDocument() {
-    this.props.contract.methods
-      .issueDocument(
-        this.state.documentName,
-        JSON.stringify(this.state.formData),
-        this.state.ownerAddress
-      )
-      .send({ from: this.props.user });
+    try {
+      this.props.contract.methods
+        .issueDocument(
+          this.state.documentName,
+          JSON.stringify(this.state.formData),
+          this.state.ownerAddress
+        )
+        .send({ from: this.props.user }, (err, txnHash) => {
+          if (err) {
+            alert(`Transaction signature denied`);
+          }
+        });
 
-    this.props.contract.methods
-      .createTemplate(
-        this.state.documentName,
-        JSON.stringify(this.state.templateData)
-      )
-      .send({ from: this.props.user });
+      this.props.contract.methods
+        .createTemplate(
+          this.state.documentName,
+          JSON.stringify(this.state.templateData)
+        )
+        .send({ from: this.props.user }, (err, txnHash) => {
+          if (err) {
+            alert(`Transaction signature denied`);
+          }
+        });
 
-    const formData = [];
-    const templateData = [];
-    const ownerAddress = '';
-    const documentName = '';
-    this.setState({ formData, templateData, ownerAddress, documentName });
+      const formData = [];
+      const templateData = [];
+      const ownerAddress = '';
+      const documentName = '';
+      this.setState({ formData, templateData, ownerAddress, documentName });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   render() {
@@ -204,17 +215,15 @@ export default class Dashboard extends Component {
                       className='flex items-center p-2 pr-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
                     >
                       <svg
-                        className='h-6 w-6 sm:h-5 sm:w-5'
+                        className='h-5 w-5'
                         xmlns='http://www.w3.org/2000/svg'
-                        fill='none'
-                        viewBox='0 0 24 24'
-                        stroke='currentColor'
+                        viewBox='0 0 20 20'
+                        fill='currentColor'
                       >
                         <path
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                          strokeWidth={2}
-                          d='M12 6v6m0 0v6m0-6h6m-6 0H6'
+                          fillRule='evenodd'
+                          d='M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z'
+                          clipRule='evenodd'
                         />
                       </svg>
                       Add another field
