@@ -5,15 +5,16 @@ import { encrypt } from 'eth-sig-util';
 import auth from '../utils/auth';
 
 import Navbar from './Navbar';
+import Field from './Field';
 export default class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.handleInputChange = this.handleInputChange.bind(this);
-    this.handleOwnerChange = this.handleOwnerChange.bind(this);
-    this.handleDocNameChange = this.handleDocNameChange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.addField = this.addField.bind(this);
     this.removeField = this.removeField.bind(this);
     this.issueDocument = this.issueDocument.bind(this);
+    this.clearInputs = this.clearInputs.bind(this);
     this.state = {
       user: '',
       contract: null,
@@ -24,7 +25,7 @@ export default class Dashboard extends Component {
     };
   }
 
-  componentDidMount = async () => {
+  componentDidMount = () => {
     if (!auth.getContract()) {
       auth.init().then(() => {
         this.setState({ user: auth.getUser(), contract: auth.getContract() });
@@ -40,14 +41,10 @@ export default class Dashboard extends Component {
     this.setState({ formData });
   }
 
-  handleOwnerChange(event) {
-    const ownerAddress = event.target.value;
-    this.setState({ ownerAddress });
-  }
-
-  handleDocNameChange(event) {
-    const documentName = event.target.value;
-    this.setState({ documentName });
+  handleChange(event) {
+    const input = event.target;
+    const value = input.value;
+    this.setState({ [input.name]: value });
   }
 
   addField() {
@@ -104,29 +101,22 @@ export default class Dashboard extends Component {
             .send({ from: this.state.user }, (err, txnHash) => {
               if (err) {
                 alert(`Transaction signature denied`);
+              } else {
+                this.clearInputs();
               }
             });
-
-          // this.state.contract.methods
-          //   .createTemplate(
-          //     this.state.documentName,
-          //     JSON.stringify(this.state.templateData)
-          //   )
-          //   .send({ from: this.state.user }, (err, txnHash) => {
-          //     if (err) {
-          //       alert(`Transaction signature denied`);
-          //     }
-          //   });
-
-          const formData = [];
-          const templateData = [];
-          const ownerAddress = '';
-          const documentName = '';
-          this.setState({ formData, templateData, ownerAddress, documentName });
         });
     } catch (error) {
       console.log(error);
     }
+  };
+
+  clearInputs = () => {
+    const formData = [];
+    const templateData = [];
+    const ownerAddress = '';
+    const documentName = '';
+    this.setState({ formData, templateData, ownerAddress, documentName });
   };
 
   render() {
@@ -169,7 +159,7 @@ export default class Dashboard extends Component {
                         id='ownerAddress'
                         autoComplete='off'
                         required
-                        onChange={this.handleOwnerChange}
+                        onChange={this.handleChange}
                         value={this.state.ownerAddress}
                         className='mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md'
                       />
@@ -188,62 +178,21 @@ export default class Dashboard extends Component {
                         id='documentName'
                         autoComplete='off'
                         required
-                        onChange={this.handleDocNameChange}
+                        onChange={this.handleChange}
                         value={this.state.documentName}
                         className='mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md'
                       />
                     </div>
 
                     {this.state.formData.map((field, i) => (
-                      <div key={i} className='col-span-9 sm:col-span-3'>
-                        <label
-                          htmlFor={`${field.fieldLabel.replace(/\s/g, '')}`}
-                          className='block text-sm font-medium text-gray-700'
-                        >
-                          {field.fieldLabel}
-                        </label>
-                        <div className='flex'>
-                          <input
-                            type={`${
-                              field.fieldLabel.toLowerCase().includes('date')
-                                ? 'date'
-                                : 'text'
-                            }`}
-                            name={`${field.fieldLabel.replace(/\s/g, '')}`}
-                            id={`${field.fieldLabel.replace(/\s/g, '')}`}
-                            autoComplete='off'
-                            required
-                            onChange={(event) => {
-                              this.handleInputChange(event, i);
-                            }}
-                            value={this.state.formData[i].fieldValue}
-                            className='mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md'
-                          />
-                          <button
-                            name='delete'
-                            id='delete'
-                            onClick={() => {
-                              this.removeField(i);
-                            }}
-                            className='ml-6 mt-1 p-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
-                          >
-                            <svg
-                              className='h-6 w-6 sm:h-5 sm:w-5'
-                              xmlns='http://www.w3.org/2000/svg'
-                              fill='none'
-                              viewBox='0 0 24 24'
-                              stroke='currentColor'
-                            >
-                              <path
-                                strokeLinecap='round'
-                                strokeLinejoin='round'
-                                strokeWidth={2}
-                                d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
+                      <Field
+                        key={i}
+                        index={i}
+                        field={field}
+                        handleInputChange={this.handleInputChange}
+                        value={this.state.formData[i].fieldValue}
+                        removeField={this.removeField}
+                      />
                     ))}
 
                     <div className='mt-6 col-span-7 sm:col-span-4'>
