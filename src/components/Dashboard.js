@@ -98,6 +98,7 @@ export default class Dashboard extends Component {
             .issueDocument(
               this.state.documentName,
               encryptedData,
+              JSON.stringify(this.state.templateData),
               this.state.ownerAddress
             )
             .send({ from: this.state.user }, (err, txnHash) => {
@@ -106,16 +107,16 @@ export default class Dashboard extends Component {
               }
             });
 
-          this.state.contract.methods
-            .createTemplate(
-              this.state.documentName,
-              JSON.stringify(this.state.templateData)
-            )
-            .send({ from: this.state.user }, (err, txnHash) => {
-              if (err) {
-                alert(`Transaction signature denied`);
-              }
-            });
+          // this.state.contract.methods
+          //   .createTemplate(
+          //     this.state.documentName,
+          //     JSON.stringify(this.state.templateData)
+          //   )
+          //   .send({ from: this.state.user }, (err, txnHash) => {
+          //     if (err) {
+          //       alert(`Transaction signature denied`);
+          //     }
+          //   });
 
           const formData = [];
           const templateData = [];
