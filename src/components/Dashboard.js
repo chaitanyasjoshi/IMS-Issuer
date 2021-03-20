@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
+import ReactNotification, { store } from 'react-notifications-component';
 import { bufferToHex } from 'ethereumjs-util';
 import { encrypt } from 'eth-sig-util';
 
 import auth from '../utils/auth';
+import 'react-notifications-component/dist/theme.css';
+import 'animate.css';
 
 import Navbar from './Navbar';
 import Field from './Field';
@@ -13,8 +16,7 @@ export default class Dashboard extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.addField = this.addField.bind(this);
     this.removeField = this.removeField.bind(this);
-    this.issueDocument = this.issueDocument.bind(this);
-    this.clearInputs = this.clearInputs.bind(this);
+
     this.state = {
       user: '',
       contract: null,
@@ -28,11 +30,40 @@ export default class Dashboard extends Component {
   componentDidMount = () => {
     if (!auth.getContract()) {
       auth.init().then(() => {
-        this.setState({ user: auth.getUser(), contract: auth.getContract() });
+        this.initialize();
       });
     } else {
-      this.setState({ user: auth.getUser(), contract: auth.getContract() });
+      this.initialize();
     }
+  };
+
+  initialize = () => {
+    this.setState(
+      { user: auth.getUser(), contract: auth.getContract() },
+      () => {
+        this.state.contract.events.DocumentIssued(
+          { filter: { issuer: this.state.user } },
+          (err, result) => {
+            if (err) {
+              return console.error(err);
+            }
+            store.addNotification({
+              title: 'Success',
+              message: 'Document issued successfully',
+              type: 'success', // 'default', 'success', 'info', 'warning'
+              container: 'top-right', // where to position the notifications
+              animationIn: ['animate__animated', 'animate__fadeInDown'], // animate.css classes that's applied
+              animationOut: ['animate__animated', 'animate__fadeOutDown'], // animate.css classes that's applied
+              dismiss: {
+                duration: 3000,
+                showIcon: true,
+                pauseOnHover: true,
+              },
+            });
+          }
+        );
+      }
+    );
   };
 
   handleInputChange(event, index) {
@@ -100,7 +131,19 @@ export default class Dashboard extends Component {
             )
             .send({ from: this.state.user }, (err, txnHash) => {
               if (err) {
-                alert(`Transaction signature denied`);
+                store.addNotification({
+                  title: 'Transaction failed',
+                  message: 'Sign the transaction to issue document',
+                  type: 'danger', // 'default', 'success', 'info', 'warning'
+                  container: 'top-right', // where to position the notifications
+                  animationIn: ['animate__animated', 'animate__fadeInDown'], // animate.css classes that's applied
+                  animationOut: ['animate__animated', 'animate__fadeOutDown'], // animate.css classes that's applied
+                  dismiss: {
+                    duration: 3000,
+                    showIcon: true,
+                    pauseOnHover: true,
+                  },
+                });
               } else {
                 this.clearInputs();
               }
@@ -123,6 +166,7 @@ export default class Dashboard extends Component {
     return (
       <div>
         <Navbar user={this.state.user} history={this.props.history} />
+        <ReactNotification className='font-Poppins' />
         <div className='mt-10 max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 font-Poppins'>
           <div className='mt-10 sm:mt-0'>
             <div className='mt-5 md:mt-0 md:col-span-2'>
