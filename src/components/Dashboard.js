@@ -125,6 +125,7 @@ export default class Dashboard extends Component {
           this.state.contract.methods
             .issueDocument(
               this.state.documentName,
+              Math.floor(Date.now() / 1000),
               encryptedData,
               JSON.stringify(this.state.templateData),
               this.state.ownerAddress
