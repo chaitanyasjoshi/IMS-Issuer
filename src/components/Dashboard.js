@@ -38,6 +38,13 @@ export default class Dashboard extends Component {
   };
 
   initialize = () => {
+    window.ethereum.on('accountsChanged', async function (accounts) {
+      auth.logout(() => {
+        this.props.history.push('/');
+        window.location.reload();
+      });
+    });
+
     this.setState(
       { user: auth.getUser(), contract: auth.getContract() },
       () => {
@@ -104,54 +111,96 @@ export default class Dashboard extends Component {
   }
 
   issueDocument = async () => {
-    try {
-      await this.state.contract.methods
-        .getEncryptionPublicKey(this.state.ownerAddress)
-        .call()
-        .then((encryptionPublicKey) => {
-          const encryptedData = bufferToHex(
-            Buffer.from(
-              JSON.stringify(
-                encrypt(
-                  encryptionPublicKey,
-                  { data: JSON.stringify(this.state.formData) },
-                  'x25519-xsalsa20-poly1305'
-                )
-              ),
-              'utf8'
-            )
-          );
+    if (this.state.ownerAddress === '' || this.state.documentName === '') {
+      store.addNotification({
+        title: 'Invalid data',
+        message: 'Please fill the neccessary fields to continue',
+        type: 'danger', // 'default', 'success', 'info', 'warning'
+        container: 'top-right', // where to position the notifications
+        animationIn: ['animate__animated', 'animate__fadeInDown'], // animate.css classes that's applied
+        animationOut: ['animate__animated', 'animate__fadeOutDown'], // animate.css classes that's applied
+        dismiss: {
+          duration: 3000,
+          showIcon: true,
+          pauseOnHover: true,
+        },
+      });
+    } else if (this.state.formData.length === 0) {
+      store.addNotification({
+        title: 'Invalid document',
+        message: 'Document is empty, please add more fields',
+        type: 'danger', // 'default', 'success', 'info', 'warning'
+        container: 'top-right', // where to position the notifications
+        animationIn: ['animate__animated', 'animate__fadeInDown'], // animate.css classes that's applied
+        animationOut: ['animate__animated', 'animate__fadeOutDown'], // animate.css classes that's applied
+        dismiss: {
+          duration: 3000,
+          showIcon: true,
+          pauseOnHover: true,
+        },
+      });
+    } else {
+      try {
+        await this.state.contract.methods
+          .getEncryptionPublicKey(this.state.ownerAddress)
+          .call()
+          .then((encryptionPublicKey) => {
+            const encryptedData = bufferToHex(
+              Buffer.from(
+                JSON.stringify(
+                  encrypt(
+                    encryptionPublicKey,
+                    { data: JSON.stringify(this.state.formData) },
+                    'x25519-xsalsa20-poly1305'
+                  )
+                ),
+                'utf8'
+              )
+            );
 
-          this.state.contract.methods
-            .issueDocument(
-              this.state.documentName,
-              Math.floor(Date.now() / 1000),
-              encryptedData,
-              JSON.stringify(this.state.templateData),
-              this.state.ownerAddress
-            )
-            .send({ from: this.state.user }, (err, txnHash) => {
-              if (err) {
-                store.addNotification({
-                  title: 'Transaction failed',
-                  message: 'Sign the transaction to issue document',
-                  type: 'danger', // 'default', 'success', 'info', 'warning'
-                  container: 'top-right', // where to position the notifications
-                  animationIn: ['animate__animated', 'animate__fadeInDown'], // animate.css classes that's applied
-                  animationOut: ['animate__animated', 'animate__fadeOutDown'], // animate.css classes that's applied
-                  dismiss: {
-                    duration: 3000,
-                    showIcon: true,
-                    pauseOnHover: true,
-                  },
-                });
-              } else {
-                this.clearInputs();
-              }
-            });
+            this.state.contract.methods
+              .issueDocument(
+                this.state.documentName,
+                Math.floor(Date.now() / 1000),
+                encryptedData,
+                JSON.stringify(this.state.templateData),
+                this.state.ownerAddress
+              )
+              .send({ from: this.state.user }, (err, txnHash) => {
+                if (err) {
+                  store.addNotification({
+                    title: 'Transaction failed',
+                    message: 'Sign the transaction to issue document',
+                    type: 'danger', // 'default', 'success', 'info', 'warning'
+                    container: 'top-right', // where to position the notifications
+                    animationIn: ['animate__animated', 'animate__fadeInDown'], // animate.css classes that's applied
+                    animationOut: ['animate__animated', 'animate__fadeOutDown'], // animate.css classes that's applied
+                    dismiss: {
+                      duration: 3000,
+                      showIcon: true,
+                      pauseOnHover: true,
+                    },
+                  });
+                } else {
+                  this.clearInputs();
+                }
+              });
+          });
+      } catch (error) {
+        store.addNotification({
+          title: 'Invalid owner address',
+          message: 'Please check and correct owner address',
+          type: 'danger', // 'default', 'success', 'info', 'warning'
+          container: 'top-right', // where to position the notifications
+          animationIn: ['animate__animated', 'animate__fadeInDown'], // animate.css classes that's applied
+          animationOut: ['animate__animated', 'animate__fadeOutDown'], // animate.css classes that's applied
+          dismiss: {
+            duration: 3000,
+            showIcon: true,
+            pauseOnHover: true,
+          },
         });
-    } catch (error) {
-      console.log(error);
+      }
     }
   };
 
@@ -196,7 +245,7 @@ export default class Dashboard extends Component {
                         htmlFor='ownerAddress'
                         className='block text-sm font-medium text-gray-700'
                       >
-                        Owner address
+                        Owner address<span className='text-red-500'>*</span>
                       </label>
                       <input
                         type='text'
@@ -215,7 +264,7 @@ export default class Dashboard extends Component {
                         htmlFor='documentName'
                         className='block text-sm font-medium text-gray-700'
                       >
-                        Document name
+                        Document name<span className='text-red-500'>*</span>
                       </label>
                       <input
                         type='text'

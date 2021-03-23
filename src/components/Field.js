@@ -8,6 +8,7 @@ export default function Field(props) {
         className='block text-sm font-medium text-gray-700'
       >
         {props.field.fieldLabel}
+        <span className='text-red-500'>*</span>
       </label>
       <div className='flex'>
         <input
