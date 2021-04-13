@@ -54,19 +54,7 @@ export default class Dashboard extends Component {
             if (err) {
               return console.error(err);
             }
-            store.addNotification({
-              title: 'Success',
-              message: 'Document issued successfully',
-              type: 'success', // 'default', 'success', 'info', 'warning'
-              container: 'top-right', // where to position the notifications
-              animationIn: ['animate__animated', 'animate__fadeInDown'], // animate.css classes that's applied
-              animationOut: ['animate__animated', 'animate__fadeOutDown'], // animate.css classes that's applied
-              dismiss: {
-                duration: 3000,
-                showIcon: true,
-                pauseOnHover: true,
-              },
-            });
+            this.notify('Success', 'Document issued successfully', 'success');
           }
         );
       }
@@ -112,33 +100,17 @@ export default class Dashboard extends Component {
 
   issueDocument = async () => {
     if (this.state.ownerAddress === '' || this.state.documentName === '') {
-      store.addNotification({
-        title: 'Invalid data',
-        message: 'Please fill the neccessary fields to continue',
-        type: 'danger', // 'default', 'success', 'info', 'warning'
-        container: 'top-right', // where to position the notifications
-        animationIn: ['animate__animated', 'animate__fadeInDown'], // animate.css classes that's applied
-        animationOut: ['animate__animated', 'animate__fadeOutDown'], // animate.css classes that's applied
-        dismiss: {
-          duration: 3000,
-          showIcon: true,
-          pauseOnHover: true,
-        },
-      });
+      this.notify(
+        'Invalid data',
+        'Please fill the neccessary fields to continue',
+        'danger'
+      );
     } else if (this.state.formData.length === 0) {
-      store.addNotification({
-        title: 'Invalid document',
-        message: 'Document is empty, please add more fields',
-        type: 'danger', // 'default', 'success', 'info', 'warning'
-        container: 'top-right', // where to position the notifications
-        animationIn: ['animate__animated', 'animate__fadeInDown'], // animate.css classes that's applied
-        animationOut: ['animate__animated', 'animate__fadeOutDown'], // animate.css classes that's applied
-        dismiss: {
-          duration: 3000,
-          showIcon: true,
-          pauseOnHover: true,
-        },
-      });
+      this.notify(
+        'Invalid document',
+        'Document is empty, please add more fields',
+        'danger'
+      );
     } else {
       try {
         await this.state.contract.methods
@@ -168,38 +140,22 @@ export default class Dashboard extends Component {
               )
               .send({ from: this.state.user }, (err, txnHash) => {
                 if (err) {
-                  store.addNotification({
-                    title: 'Transaction failed',
-                    message: 'Sign the transaction to issue document',
-                    type: 'danger', // 'default', 'success', 'info', 'warning'
-                    container: 'top-right', // where to position the notifications
-                    animationIn: ['animate__animated', 'animate__fadeInDown'], // animate.css classes that's applied
-                    animationOut: ['animate__animated', 'animate__fadeOutDown'], // animate.css classes that's applied
-                    dismiss: {
-                      duration: 3000,
-                      showIcon: true,
-                      pauseOnHover: true,
-                    },
-                  });
+                  this.notify(
+                    'Transaction failed',
+                    'Sign the transaction to issue document',
+                    'danger'
+                  );
                 } else {
                   this.clearInputs();
                 }
               });
           });
       } catch (error) {
-        store.addNotification({
-          title: 'Invalid owner address',
-          message: 'Please check and correct owner address',
-          type: 'danger', // 'default', 'success', 'info', 'warning'
-          container: 'top-right', // where to position the notifications
-          animationIn: ['animate__animated', 'animate__fadeInDown'], // animate.css classes that's applied
-          animationOut: ['animate__animated', 'animate__fadeOutDown'], // animate.css classes that's applied
-          dismiss: {
-            duration: 3000,
-            showIcon: true,
-            pauseOnHover: true,
-          },
-        });
+        this.notify(
+          'Invalid owner address',
+          'Please check and correct owner address',
+          'danger'
+        );
       }
     }
   };
@@ -210,6 +166,22 @@ export default class Dashboard extends Component {
     const ownerAddress = '';
     const documentName = '';
     this.setState({ formData, templateData, ownerAddress, documentName });
+  };
+
+  notify = (title, message, type) => {
+    store.addNotification({
+      title: title,
+      message: message,
+      type: type, // 'default', 'success', 'info', 'warning'
+      container: 'top-right', // where to position the notifications
+      animationIn: ['animate__animated', 'animate__fadeInDown'], // animate.css classes that's applied
+      animationOut: ['animate__animated', 'animate__fadeOutDown'], // animate.css classes that's applied
+      dismiss: {
+        duration: 3000,
+        showIcon: true,
+        pauseOnHover: true,
+      },
+    });
   };
 
   render() {
