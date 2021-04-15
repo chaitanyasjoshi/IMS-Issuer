@@ -41,7 +41,6 @@ export default class Dashboard extends Component {
     window.ethereum.on('accountsChanged', async function (accounts) {
       auth.logout(() => {
         this.props.history.push('/');
-        window.location.reload();
       });
     });
 
@@ -209,7 +208,7 @@ export default class Dashboard extends Component {
                         autoComplete='off'
                         disabled
                         value={this.state.user}
-                        className='mt-1 cursor-not-allowed disabled:opacity-60 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md'
+                        className='mt-1 select-none cursor-not-allowed disabled:opacity-50 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md'
                       />
                     </div>
                     <div className='col-span-9 sm:col-span-3'>
