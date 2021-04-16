@@ -9,6 +9,7 @@ import 'animate.css';
 
 import Navbar from './Navbar';
 import Field from './Field';
+import { ReactComponent as Plus } from '../assets/icons/plus.svg';
 export default class Dashboard extends Component {
   constructor(props) {
     super(props);
@@ -195,16 +196,12 @@ export default class Dashboard extends Component {
                 <div className='px-4 py-5 bg-white sm:p-6'>
                   <div className='grid grid-cols-9 gap-6'>
                     <div className='col-span-9 sm:col-span-3'>
-                      <label
-                        htmlFor='issuerAddress'
-                        className='block text-sm font-medium text-gray-700'
-                      >
+                      <label className='block text-sm font-medium text-gray-700'>
                         Issuer address
                       </label>
                       <input
                         type='text'
                         name='issuerAddress'
-                        id='issuerAddress'
                         autoComplete='off'
                         disabled
                         value={this.state.user}
@@ -212,37 +209,26 @@ export default class Dashboard extends Component {
                       />
                     </div>
                     <div className='col-span-9 sm:col-span-3'>
-                      <label
-                        htmlFor='ownerAddress'
-                        className='block text-sm font-medium text-gray-700'
-                      >
+                      <label className='block text-sm font-medium text-gray-700'>
                         Owner address<span className='text-red-500'>*</span>
                       </label>
                       <input
                         type='text'
                         name='ownerAddress'
-                        id='ownerAddress'
                         autoComplete='off'
-                        required
                         onChange={this.handleChange}
                         value={this.state.ownerAddress}
                         className='mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md'
                       />
                     </div>
-
                     <div className='col-span-9 sm:col-span-3'>
-                      <label
-                        htmlFor='documentName'
-                        className='block text-sm font-medium text-gray-700'
-                      >
+                      <label className='block text-sm font-medium text-gray-700'>
                         Document name<span className='text-red-500'>*</span>
                       </label>
                       <input
                         type='text'
                         name='documentName'
-                        id='documentName'
                         autoComplete='off'
-                        required
                         onChange={this.handleChange}
                         value={this.state.documentName}
                         className='mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md'
@@ -263,27 +249,16 @@ export default class Dashboard extends Component {
                     <div className='mt-6 col-span-7 sm:col-span-4'>
                       <button
                         name='addField'
-                        id='addField'
                         onClick={this.addField}
                         className='flex items-center p-2 pr-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
                       >
-                        <svg
-                          className='h-5 w-5'
-                          xmlns='http://www.w3.org/2000/svg'
-                          viewBox='0 0 20 20'
-                          fill='currentColor'
-                        >
-                          <path
-                            fillRule='evenodd'
-                            d='M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z'
-                            clipRule='evenodd'
-                          />
-                        </svg>
+                        <Plus className='h-5 w-5' />
                         Add another field
                       </button>
                     </div>
                   </div>
                 </div>
+
                 <div className='px-4 py-3 bg-gray-100 text-right sm:px-6'>
                   <button
                     onClick={this.issueDocument}

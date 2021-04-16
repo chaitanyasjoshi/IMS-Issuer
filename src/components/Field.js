@@ -3,13 +3,11 @@ import { ReactComponent as Delete } from '../assets/icons/delete.svg';
 export default function Field(props) {
   return (
     <div className='col-span-9 sm:col-span-3'>
-      <label
-        htmlFor={`${props.field.fieldLabel.replace(/\s/g, '')}`}
-        className='block text-sm font-medium text-gray-700'
-      >
+      <label className='block text-sm font-medium text-gray-700'>
         {props.field.fieldLabel}
         <span className='text-red-500'>*</span>
       </label>
+
       <div className='flex'>
         <input
           type={`${
@@ -18,7 +16,6 @@ export default function Field(props) {
               : 'text'
           }`}
           name={`${props.field.fieldLabel.replace(/\s/g, '')}`}
-          id={`${props.field.fieldLabel.replace(/\s/g, '')}`}
           autoComplete='off'
           onChange={(event) => {
             props.handleInputChange(event, props.index);
@@ -28,7 +25,6 @@ export default function Field(props) {
         />
         <button
           name='delete'
-          id='delete'
           onClick={() => {
             props.removeField(props.index);
           }}
