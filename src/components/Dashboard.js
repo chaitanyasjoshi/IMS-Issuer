@@ -49,7 +49,7 @@ export default class Dashboard extends Component {
       { user: auth.getUser(), contract: auth.getContract() },
       () => {
         this.state.contract.events.DocumentIssued(
-          { filter: { issuer: this.state.user } },
+          { filter: { issuer: this.state.user }, fromBlock: 'latest' },
           (err, result) => {
             if (err) {
               return console.error(err);
